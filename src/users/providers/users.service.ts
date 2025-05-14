@@ -11,7 +11,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { AuthService } from 'src/auth/providers/auth.service';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
+import profileConfig from '../config/profile.config';
 
 /**
  * Controller class for '/users' API endpoint
@@ -19,6 +20,10 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UsersService {
   constructor(
+    // inject the profile config file here
+    @Inject(profileConfig.KEY)
+    private readonly profileConfiguration: ConfigType<typeof profileConfig>,
+
     // in ject config service
     private readonly configService: ConfigService,
 
@@ -60,8 +65,8 @@ export class UsersService {
     limt: number,
     page: number,
   ) {
-    const envir = this.configService.get<string>('S3_BUCKET');
-    console.log(envir);
+    // const envir = this.configService.get<string>('S3_BUCKET');
+    console.log(this.profileConfiguration);
     return [
       {
         firstName: 'John',
@@ -84,6 +89,7 @@ export class UsersService {
   }
 
   public async findAllUsers() {
+    console.log(this.profileConfiguration);
     const users = this.usersRepository.find();
     return users;
   }
