@@ -13,25 +13,24 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
   ValidationPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './providers/users.service';
 import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CreateManyUsersDto } from './dtos/create-many-users.dto';
+import { CreateUserProvider } from './providers/create-user.provider';
 
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(
     // Injecting Users Service
-    private readonly usersService: UsersService,
+    private readonly createUserProvider: CreateUserProvider,
   ) {}
-
-  @Get()
-  public async getAllUsers() {
-    return this.usersService.findAllUsers();
-  }
 
   @Get('/:id?')
   @ApiOperation({
@@ -61,13 +60,19 @@ export class UsersController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
-    return this.usersService.findAll(getUserParamDto, limit, page);
+    return;
   }
 
   @Post()
-  public createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+  @HttpCode(HttpStatus.OK)
+  public createUsers(@Body() createUserDto: CreateUserDto) {
+    return this.createUserProvider.createUser(createUserDto);
   }
+
+  // @Post('create-many')
+  // public createManyUsers(@Body() createManyUsersDto: CreateManyUsersDto) {
+  //   return this.usersService.createMany(createManyUsersDto);
+  // }
 
   @Patch()
   public patchUser(@Body() patchUserDto: PatchUserDto) {
