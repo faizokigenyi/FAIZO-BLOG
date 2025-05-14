@@ -1,3 +1,5 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -7,8 +9,15 @@ import { PostsModule } from './posts/posts.module';
 import { Tag } from './tags/tag.entity';
 import { TagsModule } from './tags/tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+/**
+ * Importing Entities
+ * */
+import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { appConfig } from './config/app.config';
+
+// Get the current NODE_ENV
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
@@ -17,20 +26,23 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      //envFilePath: ['.env.development', '.env'],
+      envFilePath: !ENV ? '.env' : `.env.${ENV}`,
+      load: [appConfig],
     }),
     TypeOrmModule.forRootAsync({
-      imports: [],
-      inject: [],
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        // entities: [User],
+        //entities: [User],
         synchronize: true,
-        port: 5432,
-        username: 'postgres',
-        password: '1234',
-        host: 'localhost',
+        port: +configService.get('DATABASE_PORT'),
+        username: configService.get('DATABASE_USER'),
+        password: String(configService.get('DATABASE_PASSWORD')),
+        host: configService.get('DATABASE_HOST'),
         autoLoadEntities: true,
-        database: 'nestjs-blog',
+        database: configService.get('DATABASE_NAME'),
       }),
     }),
     TagsModule,

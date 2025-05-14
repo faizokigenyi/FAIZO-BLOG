@@ -28,6 +28,11 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Get()
+  public async getAllUsers() {
+    return this.usersService.findAllUsers();
+  }
+
   @Get('/:id?')
   @ApiOperation({
     summary: 'Fetches a list of registered users on the application',
