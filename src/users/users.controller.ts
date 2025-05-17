@@ -15,6 +15,7 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
@@ -23,6 +24,7 @@ import { UsersService } from './providers/users.service';
 import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateManyUsersDto } from './dtos/create-many-users.dto';
 import { CreateUserProvider } from './providers/create-user.provider';
+import { AccessTokenGuard } from 'src/auth/guards/access-token/access-token.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -64,6 +66,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   public createUsers(@Body() createUserDto: CreateUserDto) {
     return this.createUserProvider.createUser(createUserDto);

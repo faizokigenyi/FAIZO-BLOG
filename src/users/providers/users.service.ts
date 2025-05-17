@@ -13,6 +13,7 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { AuthService } from 'src/auth/providers/auth.service';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import profileConfig from '../config/profile.config';
+import { FindOneUserByEmailProvider } from './find-one-user-by-email.provider';
 
 /**
  * Controller class for '/users' API endpoint
@@ -20,6 +21,8 @@ import profileConfig from '../config/profile.config';
 @Injectable()
 export class UsersService {
   constructor(
+    // find one user by email provider
+    private readonly findOneByEmailProvider: FindOneUserByEmailProvider,
     // inject the profile config file here
     @Inject(profileConfig.KEY)
     private readonly profileConfiguration: ConfigType<typeof profileConfig>,
@@ -92,5 +95,9 @@ export class UsersService {
     console.log(this.profileConfiguration);
     const users = this.usersRepository.find();
     return users;
+  }
+
+  public findOneByEmail(email: string) {
+    return this.findOneByEmailProvider.findOneByEmail(email);
   }
 }

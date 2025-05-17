@@ -1,0 +1,16 @@
+
+POST http://localhost:3000/auth
+Content-Type: application/json
+
+{
+  "email": "faizo@gmail.com",
+  "password": "Password123#"
+}
+
+
+POST http://localhost:3000/auth/verify-token
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImVtYWlsIjoiZmFpem9AZ21haWwuY29tIiwiaWF0IjoxNzQ3NDQ4NjI5LCJleHAiOjE3NDc0NTIyMjksImF1ZCI6ImxvY2FsaG9zdDozMDAwIiwiaXNzIjoibG9jYWxob3N0OjMwMDAifQ.Z38EpsKr7E9Njzf-y67p5pQeAm2c4mAKLliuIhzoHUo"
+}

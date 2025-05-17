@@ -1,6 +1,12 @@
+import { SignInProvider } from './sign-in.provider';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
 import { UsersService } from 'src/users/providers/users.service';
+import { SignInDto } from '../dtos/signin.dto';
+import { VerifyTokenDto } from '../dtos/verify-token.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigType } from '@nestjs/config';
+import jwtConfig from '../config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -8,15 +14,44 @@ export class AuthService {
     // Injecting UserService
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+
+    /**
+     * Inject the signInProvider
+     */
+    private readonly jwtService: JwtService,
+
+    //  inject jwt congiguration
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+
+    private readonly signInProvider: SignInProvider,
   ) {}
 
-  public login(email: string, password: string, id: string) {
-    const user = this.usersService.findOneById(1);
-    // login
-    return 'SAMPLE_TOKEN';
+  public async signIn(signInDto: SignInDto) {
+    return await this.signInProvider.signIn(signInDto);
   }
 
   public isAuth() {
     return true;
+  }
+
+  public async verifyToken(verifyToken: VerifyTokenDto) {
+    try {
+      const payload = await this.jwtService.verifyAsync(verifyToken.token, {
+        secret: this.jwtConfiguration.secret,
+        issuer: this.jwtConfiguration.issuer,
+        audience: this.jwtConfiguration.audience,
+      });
+
+      return {
+        valid: true,
+        payload,
+      };
+    } catch (err) {
+      return {
+        valid: false,
+        message: err.message,
+      };
+    }
   }
 }
