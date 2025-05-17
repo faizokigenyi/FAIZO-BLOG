@@ -48,10 +48,7 @@ export class AccessTokenGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) return undefined;
-    const [type, token, food] = authHeader?.split(' ');
-
-    console.log('food', food);
-
+    const [type, token] = authHeader?.split(' ');
     return type === 'Bearer' ? token : undefined;
   }
 }
