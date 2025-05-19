@@ -69,7 +69,7 @@ export class UsersController {
 
   @Post()
   // @UseGuards(AccessTokenGuard)
-  @Auth(authType.None)
+  @Auth(authType.None, authType.Bearer)
   @HttpCode(HttpStatus.OK)
   public createUsers(@Body() createUserDto: CreateUserDto) {
     return this.createUserProvider.createUser(createUserDto);
