@@ -1,8 +1,10 @@
+
 POST http://localhost:3000/tags
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoibWFya0Bkb2UuY29tIiwiaWF0IjoxNzQ3NjQ3NDIyLCJleHAiOjE3NDc2NTEwMjIsImF1ZCI6ImxvY2FsaG9zdDozMDAwIiwiaXNzIjoibG9jYWxob3N0OjMwMDAifQ.BxKO8ExNdkSsw-M3HeeV2Xk4nHlLQKb38khFXOLtFMk
 
 {
-  "name": "javascript",
-  "slug": "javascript",
-  "description": "All posts javascript"
+  "name": "typescript",
+  "slug": "typescript",
+  "description": "All posts typescript"
 }

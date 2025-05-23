@@ -4,46 +4,47 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-
-import { AUTH_TYPE_KEY } from 'src/auth/decorators/auth.decorator';
-import { AccessTokenGuard } from '../access-token/access-token.guard';
-import { AuthType } from 'src/auth/enums/auth-type.enum';
 import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
+import { AccessTokenGuard } from '../access-token/access-token.guard';
+import { authType } from 'src/auth/enums/auth-type.enum';
+import { AUTH_TYPE_KEY } from 'src/auth/constants/auth.constants';
+
+// authType
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-  // Set the default Auth Type
-  private static readonly defaultAuthType = AuthType.Bearer;
-
-  // Create authTypeGuardMap
-  private readonly authTypeGuardMap: Record<
-    AuthType,
+  private static readonly defaultAuthType = authType.Bearer;
+  private readonly authTypeGuardmap: Record<
+    authType,
     CanActivate | CanActivate[]
   > = {
-    [AuthType.Bearer]: this.accessTokenGuard,
-    [AuthType.None]: { canActivate: () => true },
+    [authType.Bearer]: this.accessTokenGuard,
+    [authType.None]: { canActivate: () => true },
   };
 
   constructor(
     private readonly reflector: Reflector,
     private readonly accessTokenGuard: AccessTokenGuard,
   ) {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Print authTypeGuardMap
-    const authTypes = this.reflector.getAllAndOverride<AuthType[]>(
-      AUTH_TYPE_KEY,
-      [context.getHandler(), context.getClass()],
-    ) ?? [AuthenticationGuard.defaultAuthType];
-    // Show what are authTypes
+    // console.log(this.authTypeGuardmap);
+
+    // get the authTypes from the reflector
+    const authTypes = this.reflector.getAllAndOverride(AUTH_TYPE_KEY, [
+      // Boiler plate code from nestjs
+      context.getHandler(),
+      context.getClass(),
+    ]) ?? [AuthenticationGuard.defaultAuthType];
+
     console.log(authTypes);
 
-    const guards = authTypes.map((type) => this.authTypeGuardMap[type]).flat();
-    // printeGuards => Show that the user can pass an array in users controller as well
-    console.log(guards);
+    const guards = authTypes.map((type) => this.authTypeGuardmap[type]).flat();
 
-    // Declare the default error
-    let error = new UnauthorizedException();
+    // default error
+    const error = new UnauthorizedException();
+
+    // loop through guards
 
     for (const instance of guards) {
       // print each instance
@@ -55,7 +56,7 @@ export class AuthenticationGuard implements CanActivate {
         // The user is Authorised to access the resource
         instance.canActivate(context),
       ).catch((err) => {
-        error = err;
+        error: err;
       });
 
       // Display Can Activate
@@ -64,7 +65,6 @@ export class AuthenticationGuard implements CanActivate {
         return true;
       }
     }
-
     throw error;
   }
 }

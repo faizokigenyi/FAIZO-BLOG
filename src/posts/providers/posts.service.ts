@@ -9,6 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { User } from 'src/users/user.entity';
 import { waitForDebugger } from 'inspector';
+import { ActiveUserData } from 'src/auth/interfaces/active-user-data';
+import { CreatePostProvider } from './create-post.provider.ts';
 
 @Injectable()
 export class PostsService {
@@ -28,24 +30,16 @@ export class PostsService {
      * Injecting Tags service
      */
     private readonly tagsService: TagsService,
+
+    // inject create post provider
+    private readonly createPostProvider: CreatePostProvider,
   ) {}
 
   /**
    * Method to create a new post
    */
-  public async create(createPostDto: CreatePostDto) {
-    let author = await this.usersService.findOneById(createPostDto.authorId);
-
-    let tags = await this.tagsService.findMultipleTags(createPostDto.tags);
-
-    // Create the post
-    let post = this.postsRepository.create({
-      ...createPostDto,
-      author: author,
-      tags: tags,
-    });
-
-    return await this.postsRepository.save(post);
+  public async create(createPostDto: CreatePostDto, user: ActiveUserData) {
+    return await this.createPostProvider.create(createPostDto, user);
   }
 
   /**
