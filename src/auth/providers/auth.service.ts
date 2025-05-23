@@ -7,10 +7,15 @@ import { VerifyTokenDto } from '../dtos/verify-token.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from '../config/jwt.config';
+import { RefreshTokenDto } from '../dtos/refresh-token.dto';
+import { RefreshTokensProvider } from './refresh-tokens.provider';
 
 @Injectable()
 export class AuthService {
   constructor(
+    // inject refreshToekns provider
+    private readonly refreshTokensProvider: RefreshTokensProvider,
+
     // Injecting UserService
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
@@ -53,5 +58,9 @@ export class AuthService {
         message: err.message,
       };
     }
+  }
+
+  public async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+    return this.refreshTokensProvider.refreshTokens(refreshTokenDto);
   }
 }
