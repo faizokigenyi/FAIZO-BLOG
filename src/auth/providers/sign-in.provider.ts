@@ -12,10 +12,14 @@ import { JwtService } from '@nestjs/jwt';
 import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { ActiveUserData } from '../interfaces/active-user-data';
+import { GenerateTokensProvider } from './generate-tokens.provider';
 
 @Injectable()
 export class SignInProvider {
   constructor(
+    /**inject generate tokens provider */
+    private readonly generateTokensProvider: GenerateTokensProvider,
+
     // Injecting UserService
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
@@ -62,23 +66,6 @@ export class SignInProvider {
     }
 
     // Generate access token
-    const accessToken = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-        email: user.email,
-      } as ActiveUserData,
-      {
-        audience: this.jwtConfiguration.audience,
-        issuer: this.jwtConfiguration.issuer,
-        secret:
-          'dK9eTq2qdZTetgfbJ5obKYe3gN1LF145xmFKsGQ4YYAW7124euPGYz0wCHuBLay6',
-        expiresIn: this.jwtConfiguration.accessTokenTtl,
-      },
-    );
-
-    // Return Access token
-    return {
-      accessToken,
-    };
+    return await this.generateTokensProvider.generateTokens(user);
   }
 }
